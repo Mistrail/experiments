@@ -1,0 +1,33 @@
+{
+  "name": "experiments",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "some experiments",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "createModule": "node createModule.js"
+  },
+  "dependencies": {
+    "apollo-server": "^3.6.2",
+    "colors": "^1.4.0",
+    "dataloader": "^2.0.0",
+    "express": "^4.17.2",
+    "graphql": "^16.3.0",
+    "graphql-redis-subscriptions": "^2.4.2",
+    "graphql-ws": "^5.5.5",
+    "nodemon": "^2.0.15",
+    "redis": "^4.0.2",
+    "socket.io": "^4.4.1",
+    "subscriptions-transport-ws": "^0.11.0",
+    "ws": "^8.4.2"
+  },
+  "nodemonConfig": {
+    "quiet": false
+  },
+  "keywords": [
+    "experiments"
+  ],
+  "author": "tech@flowmapp.com",
+  "license": "ISC"
+}
