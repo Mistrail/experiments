@@ -1,5 +1,5 @@
 import GQL from "graphql";
-
+import {Mutation as UserMutation} from "./User/module.js"
 const {GraphQLString, GraphQLObjectType} = GQL;
 
 const fields = Object.assign({
@@ -11,7 +11,7 @@ const fields = Object.assign({
             resolve: (_, {request}) => `mutation via ${request}`
         }
     },
-    {}
+    UserMutation
 );
 
 export default new GraphQLObjectType({name: 'Mutation', fields})

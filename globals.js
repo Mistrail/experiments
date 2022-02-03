@@ -1,4 +1,6 @@
 import colors from "colors";
+import dotenv from "dotenv";
+dotenv.config();
 
 global.d = (...args) => {
     if(/^\n/.test(args[0])){
