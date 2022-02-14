@@ -1,5 +1,5 @@
 import sequelize from "sequelize";
-import connection from "./connection.js"
+import connection from "../connection.js"
 import crypto from "crypto";
 const {Sequelize, Model, DataTypes} = sequelize;
 
@@ -39,6 +39,9 @@ User.init({
     },
     password: {
         type: DataTypes.VIRTUAL,
+        validate: {
+            is: /[\S]{8,}/i
+        },
         get(){
             return "********"
         },
