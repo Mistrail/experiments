@@ -4,9 +4,9 @@ const total = Object.entries(models).length;
 let counter = 0;
 
 function showProgress(total, counter){
-    const placeHolders = "_".repeat(total - counter)
+    const placheHolders = "_".repeat(total - counter)
     const done = "#".repeat(counter);
-    process.stdout.write(`[${done}${placeHolders}]`);
+    process.stdout.write(`[${done}${placheHolders}]`);
 }
 
 (async () => {

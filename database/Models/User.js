@@ -1,24 +1,28 @@
 import sequelize from "sequelize";
 import connection from "../connection.js"
 import crypto from "crypto";
+import Contacts from "./Contacts.js";
 const {Sequelize, Model, DataTypes} = sequelize;
 
 class User extends Model{
-
     static async authorize(login, password){
         const user = await User.findOne({where: {login, isActive: true}});
         const hash = crypto.createHash("sha256");
         const challenge = hash.update(`${password}/${user.salt}`).digest('hex')
         return challenge === user.passhash ? user.get() : null;
     }
-
 }
 
 User.init({
     userID: {
-        type: DataTypes.STRING,
-        defaultValue: Sequelize.UUIDV4,
+        type: DataTypes.INTEGER,
         primaryKey: true,
+        allowNull: false
+    },
+    publicID: {
+        type: DataTypes.INTEGER,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
         allowNull: false
     },
     login: {
@@ -61,6 +65,10 @@ User.init({
     sequelize: connection,
     paranoid: true,
     timestamps: true,
+})
+
+User.afterCreate(async (instance) => {
+    await Contacts.create({userID: instance.userID()});
 })
 
 export default User;
