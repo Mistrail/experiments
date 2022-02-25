@@ -1,25 +1,34 @@
 import sequelize from "sequelize";
 import connection from "../connection.js"
-import User from "./User.js";
 
-const {Sequelize, Model, DataTypes} = sequelize;
+const {Model, DataTypes} = sequelize;
 
-class Contacts extends Model {
-}
-
+class Contacts extends Model {}
 
 Contacts.init({
     userID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true
+    },
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    lastName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    fullName: {
+        type: DataTypes.VIRTUAL,
+        get: () => {
+            return [this.firstName, this.lastName].join(" ");
+        }
     }
 }, {
     sequelize: connection,
     paranoid: true,
     timestamps: true,
 })
-
-Contacts.belongsTo(User);;
 
 export default Contacts;

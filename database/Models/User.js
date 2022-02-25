@@ -67,6 +67,8 @@ User.init({
     timestamps: true,
 })
 
+User.hasOne(Contacts, {foreignKey: 'userID', sourceKey: 'userID'});
+
 User.afterCreate(async (instance) => {
     await Contacts.create({userID: instance.userID()});
 })

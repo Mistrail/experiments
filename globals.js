@@ -3,17 +3,21 @@ import dotenv from "dotenv";
 dotenv.config();
 
 global.d = (...args) => {
-    if(/^\n/.test(args[0])){
-        process.stdout.write('\n');
+    let px = ''
+    if(args[0] === "\n"){
+        px = '\n'
+        args.shift()
     }
-    console.log('DEBUG: '.cyan, ...args)
+    console.log(`${px}DEBUG: `.cyan, ...args);
 };
 
 global.e = (...args) => {
-    if(/^\n/.test(args[0])){
-        process.stdout.write('\n');
+    let px = ''
+    if(args[0] === "\n"){
+        px = '\n'
+        args.shift()
     }
-    console.log('ERROR: '.red, ...args)
+    console.log(`${px}ERROR: `.red, ...args);
 };
 
 export default 'globals'
