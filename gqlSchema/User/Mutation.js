@@ -17,8 +17,9 @@ export const Mutation = {
         args: {
             login: {type: new GraphQLNonNull(GraphQLString)},
             password: {type: new GraphQLNonNull(GraphQLString)},
+            firstName: {type: new GraphQLNonNull(GraphQLString)},
         },
-        resolve: (root, {login, password}) => Resolve.signUp({login, password})
+        resolve: (root, {login, password, firstName}) => Resolve.signUp({login, password, firstName})
     }
 
 }

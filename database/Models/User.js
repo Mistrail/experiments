@@ -2,27 +2,28 @@ import sequelize from "sequelize";
 import connection from "../connection.js"
 import crypto from "crypto";
 import Contacts from "./Contacts.js";
+import Settings from "./Settings.js";
+
 const {Sequelize, Model, DataTypes} = sequelize;
 
+
 class User extends Model{
-    static async authorize(login, password){
-        const user = await User.findOne({where: {login, isActive: true}});
+
+    isAuth({password}) {
+        return User.generatePasshash({password, salt: this.salt}) === this.passhash;
+    }
+
+    static generatePasshash({password, salt}) {
         const hash = crypto.createHash("sha256");
-        const challenge = hash.update(`${password}/${user.salt}`).digest('hex')
-        return challenge === user.passhash ? user.get() : null;
+        return  hash.update(`${password}/${salt}`).digest('hex')
     }
 }
 
 User.init({
     userID: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false
-    },
-    publicID: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(64),
         defaultValue: Sequelize.UUIDV4,
-        unique: true,
+        primaryKey: true,
         allowNull: false
     },
     login: {
@@ -49,13 +50,18 @@ User.init({
         get(){
             return "********"
         },
-        set(value){
-            const hash = crypto.createHash("sha256");
+        set(password){
             const salt = crypto.randomBytes(32).toString('hex');
-            const digest = hash.update(`${value}/${salt}`).digest('hex')
+            const digest = User.generatePasshash({password, salt})
             this.setDataValue('passhash', digest);
             this.setDataValue('salt', salt);
         }
+    },
+    sort: {
+        type: DataTypes.INTEGER,
+        unique: true,
+        allowNull: false,
+        autoIncrement: true
     },
     isActive: {
         type: DataTypes.BOOLEAN,
@@ -68,9 +74,14 @@ User.init({
 })
 
 User.hasOne(Contacts, {foreignKey: 'userID', sourceKey: 'userID'});
+User.hasMany(Settings, {foreignKey: 'userID', sourceKey: 'userID'});
 
-User.afterCreate(async (instance) => {
-    await Contacts.create({userID: instance.userID()});
+User.afterCreate(async (instance, options) => {
+    await Contacts.create({userID: instance.userID });
+})
+
+User.afterDestroy(async (instance) => {
+    await Contacts.destroy({where: {userID: instance.userID}});
 })
 
 export default User;

@@ -6,6 +6,6 @@ const {} = GQL;
 export const Query = {
     user: {
         type: Type,
-        resolve: (root, args, ctx) => Resolve.getByUserID(ctx.userID)
+        resolve: (root, args, ctx) => Resolve.getByUserID({userID: ctx.user.userID})
     }
 }

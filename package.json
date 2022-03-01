@@ -6,11 +6,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "mocha tests/index.js",
-    "postinstall": "node install/sync.js",
-    "createModule": "node createModule.js"
+    "test": "mocha test/index.test.js",
+    "postinstall": "node install/sync.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.7",
     "winston": "^3.6.0",
     "apollo-server": "^3.6.2",
     "body-parser": "^1.19.2",
@@ -30,7 +30,8 @@
     "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "mocha": "^9.2.1"
   },
   "nodemonConfig": {
     "quiet": false

@@ -3,38 +3,27 @@ import connection from "../connection.js"
 
 const {Model, DataTypes} = sequelize;
 
-class Contacts extends Model {}
+class Settings extends Model {}
 
-Contacts.init({
+Settings.init({
     userID: {
         type: DataTypes.STRING(64),
         allowNull: false,
         primaryKey: true
     },
-    sort: {
+    name: {
         type: DataTypes.INTEGER,
         unique: true,
         allowNull: false,
         autoIncrement: true
     },
-    firstName: {
+    value: {
         type: DataTypes.STRING,
         allowNull: true,
-    },
-    lastName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    fullName: {
-        type: DataTypes.VIRTUAL,
-        get: () => {
-            return [this.firstName, this.lastName].join(" ");
-        }
     }
 }, {
     sequelize: connection,
-    paranoid: true,
-    timestamps: true,
+    timestamps: false,
 })
 
-export default Contacts;
+export default Settings;

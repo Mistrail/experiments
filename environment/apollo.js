@@ -4,13 +4,14 @@ import JWT from "jsonwebtoken";
 import {SubscriptionServer} from "subscriptions-transport-ws";
 import HTTP from "http";
 import GQL from 'graphql';
+import connection from '../database/connection.js';
 
 const {execute, subscribe} = GQL;
 const httpServer = HTTP.createServer();
 httpServer.listen(process.env.APOLLO_WS_PORT);
 const apolloServer = new Apollo.ApolloServer({
     schema,
-    context: (({ req}, x) => {
+    context: (({ req}) => {
         try {
             const user = JWT.verify(req.headers.authorization, process.env.JWT_SECRET);
             return {user, isAuth: true};
