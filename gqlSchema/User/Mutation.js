@@ -1,4 +1,3 @@
-import {Type} from "./Type.js";
 import GQL from "graphql";
 import User from "../../database/Models/User.js";
 import {ApolloError} from "apollo-server";
@@ -13,8 +12,8 @@ export const Mutation = {
             login: {type: new GraphQLNonNull(GraphQLString)},
             password: {type: new GraphQLNonNull(GraphQLString)},
         },
-        resolve: async (root, {login, password}) => {
-            const user = await User.findOne({where: {login, isActive: true}});
+        resolve: async (root, {login, password}, ctx) => {
+            const user = await User.findByPk({where: {login, isActive: true}});
             if (!user) throw new ApolloError("ERR_INVALID_LOGIN");
             if (!password) throw new ApolloError("ERR_INVALID_PASSWORD");
             return JWT.sign(user.get(), process.env.JWT_SECRET);
@@ -42,13 +41,23 @@ export const Mutation = {
             newPassword: {type: new GraphQLNonNull(GraphQLString)},
         },
         resolve: async (root, {password, newPassword}, ctx) => {
-            const user = await User.findByPk(ctx.user.userID)
-            const isAuth = user.isAuth({password});
-            if(!isAuth){
+            if(!ctx.isAuth){
                 throw new ApolloError('ERR_NOT_AUTHORIZED');
             }
+            const user = await User.findByPk(ctx.user.userID)
             await user.update({password: newPassword});
             return JWT.sign(await user.get(), process.env.JWT_SECRET);
+        }
+    },
+
+    deleteUser: {
+        type: GraphQLBoolean,
+        resolve: async (root, args, ctx) => {
+            if(!ctx.isAuth){
+                throw new ApolloError('ERR_NOT_AUTHORIZED');
+            }
+            await (await User.findByPk(ctx.user.userID)).destroy();
+            return true;
         }
     }
 

@@ -84,4 +84,8 @@ User.afterDestroy(async (instance) => {
     await Contacts.destroy({where: {userID: instance.userID}});
 })
 
+User.beforeDestroy(async (instance) => {
+    await instance.update({isActive: false});
+})
+
 export default User;
