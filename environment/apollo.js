@@ -4,7 +4,6 @@ import JWT from "jsonwebtoken";
 import {SubscriptionServer} from "subscriptions-transport-ws";
 import HTTP from "http";
 import GQL from 'graphql';
-import connection from '../database/connection.js';
 
 const {execute, subscribe} = GQL;
 const httpServer = HTTP.createServer();
