@@ -4,6 +4,8 @@ import multer from 'multer';
 import {UploadWorker} from '../workers/upload.js'
 import getTokenData from "./getTokenData.js";
 import {Context} from "./context.js";
+import fs from "fs";
+
 const uploader = new UploadWorker();
 const upload = multer({dest: "temp"});
 const app = express();
@@ -17,9 +19,12 @@ app.use((req, res, next) => {
 })
 
 app.post('/upload', upload.single('upload'), async (req, res) => {
-    uploader.postMessage({file: req.file, body: req.body});
-    uploader.worker.on("message", d);
-    res.sendStatus(200);
+    uploader.upload({file: req.file, body: req.body});
+    res.setHeader('Content-Type', 'application/json');
+    uploader.onEnd((data) => {
+        fs.unlinkSync(data.file.path);
+        res.send(JSON.stringify(data));
+    });
 })
 
 app.use((req, res) => {

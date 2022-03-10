@@ -1,13 +1,17 @@
 import {} from '../globals.js';
 import {parentPort, Worker, isMainThread} from 'worker_threads';
+import fs from 'fs';
 
 if(!isMainThread){
     parentPort.on('message', (data) => {
-        parentPort.postMessage(data)
+        const targetFilename = `${data.file.filename}.${data.file.originalname.split(/\./).pop()}`;
+        fs.copyFileSync(data.file.path, `./upload/${targetFilename}`);
+        parentPort.postMessage({file: {...data.file, filename: targetFilename}, body: data.body});
     })
 }
 
 export class UploadWorker{
+
     static WORKER_FILENAME = './workers/upload.js';
 
     constructor(data = null) {
@@ -24,7 +28,12 @@ export class UploadWorker{
                 throw new Error(`stopped with  ${code} exit code`);
         })
     }
-    postMessage(message){
-        this.worker.postMessage(message);
+    upload(data){
+        this.worker.postMessage(data);
     }
+
+    onEnd(cb){
+        this.worker.once('message', cb)
+    }
+
 }
