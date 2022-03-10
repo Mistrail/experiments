@@ -20,4 +20,8 @@ global.e = (...args) => {
     console.log(`${px}ERROR: `.red, ...args);
 };
 
+global.graphQLRequestName = (info) => {
+    return info.operation.selectionSet.selections.map(selection => selection.name.value);
+}
+
 export default 'globals'
