@@ -12,10 +12,13 @@ export const Mutation = {
             login: {type: new GraphQLNonNull(GraphQLString)},
             password: {type: new GraphQLNonNull(GraphQLString)},
         },
-        resolve: async (root, {login, password}, ctx) => {
-            const user = await User.findByPk({where: {login, isActive: true}});
+        resolve: async (root, {login, password}, ctx, info) => {
+            const user = await User.findOne({where: {login, isActive: true}});
             if (!user) throw new ApolloError("ERR_INVALID_LOGIN");
             if (!password) throw new ApolloError("ERR_INVALID_PASSWORD");
+            if(!user.isAuth({password})){
+                throw new ApolloError('ERR_NOT_AUTHORIZED');
+            }
             return JWT.sign(user.get(), process.env.JWT_SECRET);
         }
     },
@@ -29,7 +32,7 @@ export const Mutation = {
         resolve: async (root, {login, password, firstName}) => {
             const user = await User.create({login, password}, {isNewRecord: true});
             if(user){
-                await Contacts.upsert({userID: user.userID, firstName})
+                await Contacts.upsert({userID: user.userID, firstName});
             }
             return JWT.sign(user.get(), process.env.JWT_SECRET);
         }
@@ -44,12 +47,25 @@ export const Mutation = {
             if(!ctx.isAuth){
                 throw new ApolloError('ERR_NOT_AUTHORIZED');
             }
-            const user = await User.findByPk(ctx.user.userID)
+            const user = await User.findByPk(ctx.user.userID);
             await user.update({password: newPassword});
             return JWT.sign(await user.get(), process.env.JWT_SECRET);
         }
     },
-
+    changeLogin: {
+        type: GraphQLString,
+        args: {
+            newLogin: {type: new GraphQLNonNull(GraphQLString)},
+        },
+        resolve: async (root, {newLogin}, ctx) => {
+            if(!ctx.isAuth){
+                throw new ApolloError('ERR_NOT_AUTHORIZED');
+            }
+            const user = await User.findByPk(ctx.user.userID);
+            await user.update({login: newLogin});
+            return JWT.sign(await user.get(), process.env.JWT_SECRET);
+        }
+    },
     deleteUser: {
         type: GraphQLBoolean,
         resolve: async (root, args, ctx) => {
@@ -60,5 +76,4 @@ export const Mutation = {
             return true;
         }
     }
-
 }

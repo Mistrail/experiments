@@ -30,6 +30,7 @@
     "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
+    "redis-cli": "^2.1.2",
     "nodemon": "^2.0.15",
     "mocha": "^9.2.1"
   },

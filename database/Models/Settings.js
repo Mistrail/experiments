@@ -3,7 +3,9 @@ import connection from "../connection.js"
 
 const {Model, DataTypes} = sequelize;
 
-class Settings extends Model {}
+class Settings extends Model {
+
+}
 
 Settings.init({
     userID: {

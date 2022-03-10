@@ -1,4 +1,5 @@
-import globals from './globals.js'
+import {} from './globals.js';
+
 import apollo from "./environment/apollo.js";
 import app from "./environment/app.js";
 
