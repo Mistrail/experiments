@@ -1,19 +1,20 @@
 import {} from '../globals.js';
 import {parentPort, Worker, isMainThread} from 'worker_threads';
-import fs from 'fs';
 
 if(!isMainThread){
     parentPort.on('message', (data) => {
-        const targetFilename = `${data.file.filename}.${data.file.originalname.split(/\./).pop()}`;
-        fs.copyFileSync(data.file.path, `./upload/${targetFilename}`);
-        parentPort.postMessage({file: {...data.file, filename: targetFilename}, body: data.body});
+        const files = [];
+        // @todo queue file processing
+        data.files.forEach(file => {
+            files.push(file);
+        })
+        parentPort.postMessage({files});
     })
 }
 
 export class UploadWorker{
 
     static WORKER_FILENAME = './workers/upload.js';
-
     constructor(data = null) {
         this.worker = new Worker(UploadWorker.WORKER_FILENAME, {workerData: data});
     }
@@ -30,6 +31,10 @@ export class UploadWorker{
     }
     upload(data){
         this.worker.postMessage(data);
+    }
+
+    onProgress(cb){
+        this.worker.on('message', cb)
     }
 
     onEnd(cb){

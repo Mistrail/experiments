@@ -5,7 +5,7 @@ import {UploadWorker} from '../workers/upload.js'
 import getTokenData from "./getTokenData.js";
 import {Context} from "./context.js";
 import fs from "fs";
-
+const MAX_UPLOAD_COUNT = 10;
 const uploader = new UploadWorker();
 const upload = multer({dest: "temp"});
 const app = express();
@@ -18,13 +18,16 @@ app.use((req, res, next) => {
     next();
 })
 
-app.post('/upload', upload.single('upload'), async (req, res) => {
-    uploader.upload({file: req.file, body: req.body});
+app.post('/upload', upload.array('upload', MAX_UPLOAD_COUNT), async (req, res) => {
+    uploader.upload({files: req.files, body: req.body});
     res.setHeader('Content-Type', 'application/json');
     uploader.onEnd((data) => {
-        fs.unlinkSync(data.file.path);
-        res.send(JSON.stringify(data));
+        data.files.forEach(file => {
+            fs.unlinkSync(file.path);
+        });
+        res.send(data);
     });
+
 })
 
 app.use((req, res) => {
