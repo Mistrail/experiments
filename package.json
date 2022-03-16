@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "^6.0.0-alpha.7",
-    "winston": "^3.6.0",
     "apollo-server": "^3.6.2",
     "body-parser": "^1.19.2",
+    "bull": "^4.7.0",
     "colors": "^1.4.0",
     "dataloader": "^2.0.0",
     "dotenv": "^16.0.0",
@@ -27,10 +27,10 @@
     "nodemon": "^2.0.15",
     "redis": "^4.0.2",
     "sequelize": "^6.15.0",
-    "subscriptions-transport-ws": "^0.11.0"
+    "subscriptions-transport-ws": "^0.11.0",
+    "winston": "^3.6.0"
   },
   "devDependencies": {
-    "redis-cli": "^2.1.2",
     "nodemon": "^2.0.15",
     "mocha": "^9.2.1"
   },

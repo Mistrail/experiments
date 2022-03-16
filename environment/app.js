@@ -1,14 +1,14 @@
 import express from 'express'
 import bodyParser from 'body-parser';
 import multer from 'multer';
-import {UploadWorker} from '../workers/upload.js'
+import {uploadQueue, upload} from '../workers/upload.js'
 import getTokenData from "./getTokenData.js";
 import {Context} from "./context.js";
-import fs from "fs";
+import pubsub from './pubsub.js'
 const MAX_UPLOAD_COUNT = 10;
-const uploader = new UploadWorker();
-const upload = multer({dest: "temp"});
+const multerUpload = multer({dest: "temp"});
 const app = express();
+import {UPLOAD} from '../config/pubsubTrigger.js';
 
 app.use(bodyParser.json());
 app.context = new Context;
@@ -18,23 +18,24 @@ app.use((req, res, next) => {
     next();
 })
 
-app.post('/upload', upload.array('upload', MAX_UPLOAD_COUNT), async (req, res) => {
-    uploader.upload({files: req.files, body: req.body});
-    res.setHeader('Content-Type', 'application/json');
-    uploader.onEnd((data) => {
-        data.files.forEach(file => {
-            fs.unlinkSync(file.path);
-        });
-        res.send(data);
-    });
-
+app.post('/upload', multerUpload.array('upload', MAX_UPLOAD_COUNT), async (req, res) => {
+    if(!app.context.data.isAuth) {
+        res.sendStatus(401);
+        return;
+    }
+    req.files.forEach(upload);
+    uploadQueue.on('completed', (job, result) => {
+        pubsub.publish(UPLOAD(app.context.data.user.userID), {system: [JSON.stringify(result)]});
+        res.sendStatus(200);
+    })
+    upload.on('error', (err) => {
+        res.sendStatus(500);
+    })
 })
 
 app.use((req, res) => {
     res.sendStatus(404);
 })
-
-uploader.listen();
 
 export default async function () {
     app.listen(process.env.EXPRESS_PORT);
