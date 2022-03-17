@@ -1,12 +1,13 @@
 import GQL from "graphql";
 import pubsub from "../environment/pubsub.js";
-
 const {GraphQLList, GraphQLString, GraphQLObjectType} = GQL;
 
 const fields = Object.assign({
         system: {
             type: new GraphQLList(GraphQLString),
-            subscribe: () => pubsub.asyncIterator(["SYSTEM"])
+            subscribe: (root, args, context) => {
+                return pubsub.asyncIterator(context.get('channels'));
+            }
         }
     },
     {}
