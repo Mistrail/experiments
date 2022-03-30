@@ -1,40 +1,41 @@
 import express from 'express'
+import { UPLOAD } from '../config/settings.js'
 import bodyParser from 'body-parser';
 import multer from 'multer';
-import {uploadQueue, upload} from '../workers/upload.js'
 import getTokenData from "./getTokenData.js";
 import {Context} from "./context.js";
-import pubsub from './pubsub.js'
-const MAX_UPLOAD_COUNT = 10;
-const multerUpload = multer({dest: "temp"});
+import runUploader from '../uploader/worker.js';
+import {v4 as uuidv4} from 'uuid';
+const multerUpload = multer({dest: UPLOAD.TMP});
 const app = express();
-import {UPLOAD} from '../config/pubsubTrigger.js';
 
 app.use(bodyParser.json());
-app.context = new Context;
+app.context = new Context();
+const uploader = runUploader();
 
 app.use((req, res, next) => {
     app.context.bind(getTokenData(req.headers.authorization));
     next();
 })
 
-app.post('/upload', multerUpload.array('upload', MAX_UPLOAD_COUNT), async (req, res) => {
-    if(!app.context.data.isAuth) {
-        res.sendStatus(401);
-        return;
+app.post('/upload', multerUpload.array(UPLOAD.FIELD_NAME, UPLOAD.MAX_UPLOAD_COUNT), async (req, res) => {
+    if (!app.context.isAuth) {
+        res.status(401);
     }
-    req.files.forEach(upload);
-    uploadQueue.on('completed', (job, result) => {
-        pubsub.publish(UPLOAD(app.context.data.user.userID), {system: [JSON.stringify(result)]});
-        res.sendStatus(200);
+    req.files.forEach(file => {
+        uploader.upload({file, ...req.body}, app.context);
     })
-    upload.on('error', (err) => {
-        res.sendStatus(500);
+
+    uploader.on('message', (data) => {
+        d(`@todo Send data by pubsub to current user personal channel {USER:${app.context.user.userID}: ...}`)
+        // @todo Send data by pubsub to current user personal channel
     })
+
+    res.send({action: 'upload', state: 'start', count: req.files.length, seed: req.body.seed || null})
 })
 
 app.use((req, res) => {
-    res.sendStatus(404);
+    res.status(404).send('Not found');
 })
 
 export default async function () {

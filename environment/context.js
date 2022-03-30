@@ -1,12 +1,9 @@
 export class Context{
-    _data = {}
     bind(value){
-        this._data = {...this._data, ...value}
-    }
-    get(key){
-        return this._data[key];
-    }
-    get data() {
-        return this._data
+        const entries = Object.entries(value);
+        entries.forEach(([name, val]) => {
+            this[name] = val;
+        })
+        return this;
     }
 }
