@@ -1,5 +1,5 @@
 import {Type} from "./Type.js";
-import GQL from "graphql";
+// import GQL from "graphql";
 import {Users} from "../../database/models.js";
 
 export const Query = {

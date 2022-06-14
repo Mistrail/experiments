@@ -4,7 +4,21 @@ import {Model, DataTypes, Op} from 'sequelize'
 class Contacts extends Model {}
 
 Contacts.init({
-        // fields here...        
+        guid: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4()
+        },
+        users_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        firstName: {
+            type: DataTypes.STRING,
+        },
+        lastName: {
+            type: DataTypes.STRING,
+        }
     },
     {
         sequelize: connection,

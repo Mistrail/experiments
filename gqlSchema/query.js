@@ -1,17 +1,19 @@
-import GQL from "graphql";
-import pubsub from "../environment/pubsub.js";
-const {GraphQLString, GraphQLObjectType} = GQL;
+import GQL from "graphql"
+import pubSub from "../environment/pubsub.js"
+import {Query as UserQuery} from './User/module.js'
 
-import {Query as UserQuery} from './User/module.js';
+const {GraphQLString, GraphQLObjectType} = GQL
+
+const globalQueries = {
+    version: {type: GraphQLString, resolve: () => {
+            pubSub.publish('SYSTEM', {system: [process.env.VERSION]}).then()
+            return process.env.VERSION
+        }
+    }
+}
 
 const fields = Object.assign(
-    {
-        version: {type: GraphQLString, resolve: () => {
-                pubsub.publish('SYSTEM', {system: [process.env.VERSION]}).then()
-                return process.env.VERSION
-            }
-        }
-    },
+    globalQueries,
     UserQuery
 );
 
