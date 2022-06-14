@@ -4,7 +4,8 @@ const {GraphQLString, GraphQLObjectType} = GQL;
 
 import {Query as UserQuery} from './User/module.js';
 
-const fields = Object.assign({
+const fields = Object.assign(
+    {
         version: {type: GraphQLString, resolve: () => {
                 pubsub.publish('SYSTEM', {system: [process.env.VERSION]}).then()
                 return process.env.VERSION

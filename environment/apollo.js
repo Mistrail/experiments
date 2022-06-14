@@ -18,11 +18,10 @@ const apolloServer = new Apollo.ApolloServer({
     context: (({ req}) => {
         const userData = getTokenData(req.headers.authorization);
         context.bind(userData);
-        context.bind({channels: ['SYSTEM', `USER:${userData.user.userID}`]});
+        context.bind({channels: ['SYSTEM', `USER:${userData.user?.id || null}`]});
         return context;
     })
 });
-
 
 export default async () => {
     SubscriptionServer.create(

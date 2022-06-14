@@ -1,10 +1,10 @@
-import {} from '../globals.js'
-import models from "../database/models.js";
+import '../globals.js'
+import * as models from "../database/models.js";
 import Connection from '../database/connection.js'
 const total = Object.entries(models).length;
 const moduleNames = Object.keys(models);
 let counter = 0;
-const force = true;
+const force = false;
 
 function showProgress(total, counter){
     const placeHolders = "_".repeat(total - counter)

@@ -1,11 +1,10 @@
 import {Type} from "./Type.js";
 import GQL from "graphql";
-import User from "../../database/Models/User.js";
-const {} = GQL;
+import {Users} from "../../database/models.js";
 
 export const Query = {
     user: {
         type: Type,
-        resolve: (root, args, ctx) => User.findByPk(ctx.user.userID)
+        resolve: (root, args, ctx) => Users.findByPk(ctx.user?.id)
     }
 }

@@ -1,5 +1,4 @@
 import './globals.js';
-
 import apollo from "./environment/apollo.js";
 import app from "./environment/app.js";
 
